@@ -5,26 +5,26 @@
 
 typedef struct Cliente{
     int id_cliente;                         //ID para identificar o cliente
-    int id_cidade;                         //Os ID's est„o na Matriz de dist‚ncias
-    int tempo_ultima_visita;              //(dias)     //Tempo desde a ˙ltima visita.
-    float insatisfacao_cliente;          //(0-1)      //NÌvel de insatisfaÁ„o do cliente.
-    int freq_uso_suporte;               //(dias/mÍs) //Freq. de uso do suporte.
-    float PRIORIDADE;                  //Ser· usado para alocar os Clientes sequencialmente.
+    int id_cidade;                         //Os ID's est√£o na Matriz de dist√¢ncias
+    int tempo_ultima_visita;              //(dias)     //Tempo desde a √∫ltima visita.
+    float insatisfacao_cliente;          //(0-1)      //N√≠vel de insatisfa√ß√£o do cliente.
+    int freq_uso_suporte;               //(dias/m√™s) //Freq. de uso do suporte.
+    float PRIORIDADE;                  //Ser√° usado para alocar os Clientes sequencialmente.
     int tipo_software;    //1:Shop 2:Pack 3:Bimer  //Tipo do software que o cliente usa.
 }Cliente;
 typedef struct Analista{
     int id_cidade_base;                //ID da cidade base do analista.
-    int id_cidade_atual;              //ID da cidade onde o analista est·.
-    float grau_ociosidade;           //(0-1)(%dia)    //Grau de ocupaÁ„o|ociosidade do Analista.
+    int id_cidade_atual;              //ID da cidade onde o analista est√°.
+    float grau_ociosidade;           //(0-1)(%dia)    //Grau de ocupa√ß√£o|ociosidade do Analista.
     int tipo_software;      //1:Shop 2:Pack 3:Bimer  //Tipo do software que o Analist0a entende.
     int velocidade_media;          //(km/h)
     float custo_por_km;           //(R$)
 
 }Analista;
-#define TAM_POPULACAO 50
-#define NUM_GERACOES 10000
-#define TAXA_CRUZAMENTO 0.85
-#define TAXA_MUTACAO 0.15
+#define TAM_POPULACAO 1000
+#define NUM_GERACOES 500000
+#define TAXA_CRUZAMENTO 0.75
+#define TAXA_MUTACAO 0.25
 #define QNT_VISITAS 5
 #define MULTA_SOFTWARE_INCOMPATIVEL 5000000.0
 
@@ -33,14 +33,14 @@ typedef struct{
     float custo;   // Fitness
 }Individuo;
 
-int total_cidades; // N˙mero total de cidades (incluindo a base).
+int total_cidades; // N√∫mero total de cidades (incluindo a base).
 float** matriz_distancias;
  /*                                //(em km)
 float matriz_distancias[NUM_CIDADES][NUM_CIDADES]={
-    {0.0, 27.2,  55.7, 58.5},  // 0: Sede(MacaÈ)
+    {0.0, 27.2,  55.7, 58.5},  // 0: Sede(Maca√©)
     {26.5, 0.0, 87.9, 83.2},  // 1: Rio das Ostras
-    {49, 88.1, 0.0, 47.5},   // 2: ConceiÁ„o de Macabu
-    {55.7, 109, 47.6, 0.0}  // 3: Quissamò„
+    {49, 88.1, 0.0, 47.5},   // 2: Concei√ß√£o de Macabu
+    {55.7, 109, 47.6, 0.0}  // 3: QuissamÀú√£
 };
 */
 
@@ -51,9 +51,9 @@ void CarregaMatriz(){
         exit(-1);
     }
 
-    fscanf(f, "%d", &total_cidades); // LÍ o tamanho da matriz (atribui valor ‡ total_cidades)
+    fscanf(f, "%d", &total_cidades); // L√™ o tamanho da matriz (atribui valor √† total_cidades)
 
-    // AlocaÁ„o din‚mica da matriz de dist‚ncias
+    // Aloca√ß√£o din√¢mica da matriz de dist√¢ncias
     matriz_distancias = (float **)malloc(total_cidades * sizeof(float *));
     for(int i=0; i<total_cidades; i++){
         matriz_distancias[i] = (float *)malloc(total_cidades * sizeof(float));
@@ -67,7 +67,7 @@ void CarregaMatriz(){
 
 int** matriz_tempos_atendimento;
 void CarregaTemposAtendimento(int num_analistas, int num_clientes){
-    // Aloca a memÛria para os Analistas (linhas)
+    // Aloca a mem√≥ria para os Analistas (linhas)
     matriz_tempos_atendimento = (int **)malloc(num_analistas * sizeof(int *));
 
     FILE *arquivo = fopen("tempos_atendimento.txt", "r");
@@ -77,7 +77,7 @@ void CarregaTemposAtendimento(int num_analistas, int num_clientes){
     }
 
     for(int i=0; i<num_analistas; i++){
-        // Aloca a memÛria para os Clientes (colunas)
+        // Aloca a mem√≥ria para os Clientes (colunas)
         matriz_tempos_atendimento[i] = (int *)malloc(num_clientes * sizeof(int));
 
         for(int j=0; j<num_clientes; j++)
@@ -94,9 +94,9 @@ int CarregaClientes(Cliente **clientes){
     }
 
     int qtd;
-    fscanf(f, "%d", &qtd); // LÍ a quantidade de clientes
+    fscanf(f, "%d", &qtd); // L√™ a quantidade de clientes
 
-    // Aloca a memÛria exata para a quantidade lida
+    // Aloca a mem√≥ria exata para a quantidade lida
     *clientes = (Cliente *)malloc(qtd * sizeof(Cliente));
 
     for(int i=0; i<qtd; i++){
@@ -108,7 +108,7 @@ int CarregaClientes(Cliente **clientes){
                &(*clientes)[i].tipo_software);
 
                (*clientes)[i].id_cliente = i;
-               (*clientes)[i].PRIORIDADE = 0; // PRIORIDADE ser· calculado depois
+               (*clientes)[i].PRIORIDADE = 0; // PRIORIDADE ser√° calculado depois
     }
     fclose(f);
     printf("%d Clientes carregados com sucesso.\n", qtd); //[DEBUG]
@@ -134,7 +134,7 @@ int CarregaAnalistas(Analista **analistas){
                &(*analistas)[i].velocidade_media,
                &(*analistas)[i].custo_por_km);
 
-        // A cidade atual comeÁa igual ‡ cidade base
+        // A cidade atual come√ßa igual √† cidade base
         (*analistas)[i].id_cidade_atual = (*analistas)[i].id_cidade_base;
     }
     fclose(f);
@@ -156,11 +156,11 @@ float CalculaCustoDeslocamento(Cliente C, Analista A){
 
 float CalculaPrioridade(Cliente C){
  if(C.tempo_ultima_visita < 90)
-    return -1; //Ignorado, regra de negÛcio
+    return -1; //Ignorado, regra de neg√≥cio
 
     float PRIORIDADE = C.tempo_ultima_visita*0.5 + C.insatisfacao_cliente*0.3 + C.freq_uso_suporte*0.2;
     if(C.tempo_ultima_visita > 150)
-        PRIORIDADE += 1000; //BÙnus para priorizar o atendimento
+        PRIORIDADE += 1000; //B√¥nus para priorizar o atendimento
 
     return PRIORIDADE;
 }
@@ -173,7 +173,7 @@ float CalculaScore(Cliente C, Analista A){
     }
 }
 
-//Soma o custo(R$) e aplica puniÁ„o(multa) caso algum cliente que deveria, mas n„o fora atendido, ou analista ocioso.
+//Soma o custo(R$) e aplica puni√ß√£o(multa) caso algum cliente que deveria, mas n√£o fora atendido, ou analista ocioso.
 float CalculaCustoTotalSolucao(int* alocacao, Cliente* clientes, Analista* analistas, int num_clientes, int num_analistas){
     float custo_total = 0.0;
     int cidades_atuais[num_analistas];
@@ -181,7 +181,7 @@ float CalculaCustoTotalSolucao(int* alocacao, Cliente* clientes, Analista* anali
     float tempo_trabalhado[num_analistas];
 
     for(int j=0; j<num_analistas; j++){
-        cidades_atuais[j] = analistas[j].id_cidade_base; //"Reset" na localizaÁ„o
+        cidades_atuais[j] = analistas[j].id_cidade_base; //"Reset" na localiza√ß√£o
         visitas_realizadas[j] = 0; //"Reset" nas visitas
         tempo_trabalhado[j] = 0.0;
     }
@@ -201,7 +201,7 @@ float CalculaCustoTotalSolucao(int* alocacao, Cliente* clientes, Analista* anali
             cidades_atuais[id] = clientes[i].id_cidade;
             visitas_realizadas[id]++;
         }
-        else if(id == -1) //Se n„o foi atendido
+        else if(id == -1) //Se n√£o foi atendido
             custo_total += 500000.0; //Multa muito alta pelo cliente ignorado
     }
 
@@ -215,7 +215,7 @@ float CalculaCustoTotalSolucao(int* alocacao, Cliente* clientes, Analista* anali
             tempo_trabalhado[j] += tempo_volta;
         }
 
-        //Validando as regras de negÛcio
+        //Validando as regras de neg√≥cio
         int meta = 0;
         if(analistas[j].tipo_software == 1)
             meta = 4;
@@ -225,7 +225,7 @@ float CalculaCustoTotalSolucao(int* alocacao, Cliente* clientes, Analista* anali
             meta = 2;
 
         if(visitas_realizadas[j] > 0){
-            if(visitas_realizadas[j] < meta){ //Multa por n„o bater a meta de visitas
+            if(visitas_realizadas[j] < meta){ //Multa por n√£o bater a meta de visitas
                 int faltou = meta - visitas_realizadas[j];
                 custo_total += (faltou * 50000.0);
             }
@@ -255,7 +255,7 @@ void BuscaLocalRealocacao(int* alocacao, int* tempo_analistas, Cliente* clientes
         melhorou = false;
 
         for(int i=0; i<num_clientes; i++){
-            if(alocacao[i] == -2) //Ignora visitas desnecess·rias(regra de negÛcio)
+            if(alocacao[i] == -2) //Ignora visitas desnecess√°rias(regra de neg√≥cio)
                 continue;
 
             int analista_antigo = alocacao[i];
@@ -267,7 +267,7 @@ void BuscaLocalRealocacao(int* alocacao, int* tempo_analistas, Cliente* clientes
                 if(clientes[i].tipo_software != analistas[j].tipo_software) //Incompatibilidade do tipo de software
                     continue;
                 int tempo_gasto = matriz_tempos_atendimento[j][i];
-                if(tempo_analistas[j] + tempo_gasto > 480) //Tempo m·ximo de 8h atingido (carga de trabalho/dia)
+                if(tempo_analistas[j] + tempo_gasto > 480) //Tempo m√°ximo de 8h atingido (carga de trabalho/dia)
                     continue;
 
                 //Testa a troca
@@ -293,7 +293,7 @@ void BuscaLocalRealocacao(int* alocacao, int* tempo_analistas, Cliente* clientes
 
     //printf("[BUSCA LOCAL:Realocacao] Custo inicial apos a Realocacao: R$ %.2f\n", custo_atual);
 }
-void BuscaLocalTroca(int* alocacao, int* tempo_analistas, Cliente* clientes, Analista* analistas, int num_clientes, int num_analistas){ //Ideal para os casos onde a RealocaÁ„o excede o tempo m·ximo de 8 horas(regra de negÛcio)
+void BuscaLocalTroca(int* alocacao, int* tempo_analistas, Cliente* clientes, Analista* analistas, int num_clientes, int num_analistas){ //Ideal para os casos onde a Realoca√ß√£o excede o tempo m√°ximo de 8 horas(regra de neg√≥cio)
     bool melhorou = true;
     float custo_atual = CalculaCustoTotalSolucao(alocacao, clientes, analistas, num_clientes, num_analistas);
     //printf("\n[BUSCA LOCAL:Troca] Custo inicial anteriormente: R$ %.2f\n", custo_atual);
@@ -308,18 +308,18 @@ void BuscaLocalTroca(int* alocacao, int* tempo_analistas, Cliente* clientes, Ana
                 int analista_i = alocacao[i];
                 int analista_k = alocacao[k];
 
-                if(analista_i<0 || analista_k<0) //Visitas canceladas ou n„o alocadas
+                if(analista_i<0 || analista_k<0) //Visitas canceladas ou n√£o alocadas
                     continue;
                 if(analista_i == analista_k) //Mesmo Analista
                     continue;
 
-                //Incompatibilidade do tipo de software (regra de negÛcio)
+                //Incompatibilidade do tipo de software (regra de neg√≥cio)
                 if(clientes[k].tipo_software != analistas[analista_i].tipo_software)
                     continue;
                 if(clientes[i].tipo_software != analistas[analista_k].tipo_software)
                     continue;
 
-                //Verificando o limite de 8 horas (regra de negÛcio)
+                //Verificando o limite de 8 horas (regra de neg√≥cio)
                 int tempo_i_no_a = matriz_tempos_atendimento[analista_i][i];
                 int tempo_k_no_a = matriz_tempos_atendimento[analista_i][k];
 
@@ -360,20 +360,20 @@ void BuscaLocalTroca(int* alocacao, int* tempo_analistas, Cliente* clientes, Ana
     //printf("[BUSCA LOCAL:Troca] Custo inicial apos a Troca: R$ %.2f\n", custo_atual);
 }
 
-void trocar(Cliente* a, Cliente* b){ //FunÁ„o auxiliar para o quicksort
+void trocar(Cliente* a, Cliente* b){ //Fun√ß√£o auxiliar para o quicksort
     Cliente temp = *a;
     *a = *b;
     *b = temp;
 }
-int particionar(Cliente array[], int baixo, int alto){ //FunÁ„o auxiliar para o quicksort
+int particionar(Cliente array[], int baixo, int alto){ //Fun√ß√£o auxiliar para o quicksort
     int pivo = array[alto].PRIORIDADE;
 
-    //Õndice dos elementos maiores que pivÙ
+    //√çndice dos elementos maiores que piv√¥
     int i = (baixo-1);
 
     for(int j=baixo; j<alto; j++){
         if(array[j].PRIORIDADE > pivo){
-            i++; // Incrementa o Ìndice do maior elemento se for maior que pivÙ
+            i++; // Incrementa o √≠ndice do maior elemento se for maior que piv√¥
             trocar(&array[i], &array[j]);
         }
     }
@@ -394,14 +394,14 @@ int* GeraSolucaoConstrutiva(Cliente* clientes, Analista* analistas, int num_clie
     int* tempo_total_analista = (int*)calloc(num_analistas, sizeof(int)); //Inicializa com '0's
     int* total_visitas_analista = (int*)calloc(num_analistas, sizeof(int));
 
-    //Reseta as cidades atuais dos analistas para a base antes de comeÁar
+    //Reseta as cidades atuais dos analistas para a base antes de come√ßar
     for(int j=0; j<num_analistas; j++)
         analistas[j].id_cidade_atual = analistas[j].id_cidade_base;
 
 
     for(int i=0; i<num_clientes; i++){
         if(clientes[i].PRIORIDADE < 0){
-            alocacao[i] = -2; // Visita desnecess·ria
+            alocacao[i] = -2; // Visita desnecess√°ria
             continue;
         }
 
@@ -430,7 +430,7 @@ int* GeraSolucaoConstrutiva(Cliente* clientes, Analista* analistas, int num_clie
         }
 
         if(min_score == 1000000.0){
-            alocacao[i] = -1; // Sem analista compatÌvel ou sem tempo
+            alocacao[i] = -1; // Sem analista compat√≠vel ou sem tempo
             continue;
         }
 
@@ -460,7 +460,7 @@ int* GeraSolucaoConstrutiva(Cliente* clientes, Analista* analistas, int num_clie
 }
 
 int SelecaoTorneio(Individuo* populacao, int k){
-    int melhor = rand() % TAM_POPULACAO; //Melhor È inicializado aleatoriamente
+    int melhor = rand() % TAM_POPULACAO; //Melhor √© inicializado aleatoriamente
     for(int i=1; i<k; i++){
         int candidato = rand() % TAM_POPULACAO;
         if(populacao[candidato].custo < populacao[melhor].custo)
@@ -495,7 +495,7 @@ void Mutacao(Individuo ind, Cliente* clientes, Analista* analistas, int num_clie
 
             if(qnt_compativeis > 0){ //Havendo Analistas compativeis
                 if(rand() % 5 == 0) //20% de chance
-                    ind.alocacao[i] = -1; //n„o haver· alocaÁ„o(para testar outras rotas)
+                    ind.alocacao[i] = -1; //n√£o haver√° aloca√ß√£o(para testar outras rotas)
                 else
                     ind.alocacao[i] = compativeis[rand() % qnt_compativeis];
             }
@@ -504,14 +504,14 @@ void Mutacao(Individuo ind, Cliente* clientes, Analista* analistas, int num_clie
 }
 
 void LiberaMemoria(Individuo* populacao, Individuo* nova_populacao, int* alocacao_melhor_global, Cliente* clientes, Analista* analistas, int numero_analistas){
-    // LiberaÁ„o de MemÛria (AG)
+    // Libera√ß√£o de Mem√≥ria (AG)
     for(int i=0; i<TAM_POPULACAO; i++){
         free(populacao[i].alocacao);
         free(nova_populacao[i].alocacao);
     }
     free(alocacao_melhor_global);
 
-    //LiberaÁ„o de MemÛria (Matrizes)
+    //Libera√ß√£o de Mem√≥ria (Matrizes)
     for(int i=0; i< total_cidades; i++)
         free(matriz_distancias[i]);
     free(matriz_distancias);
@@ -540,7 +540,7 @@ int main(){
     for(int i=0; i<numero_clientes; i++)
         clientes[i].PRIORIDADE = CalculaPrioridade(clientes[i]);
 
-    //Ordena em ordem decrescente os clientes em relaÁ„o a PRIORIDADE
+    //Ordena em ordem decrescente os clientes em rela√ß√£o a PRIORIDADE
     quickSort(clientes, 0, numero_clientes-1);
 
 
@@ -560,10 +560,10 @@ int main(){
     melhor_global.custo = 100000000; //Inicializando com valor muito alto
 
     printf("\nAG: Iniciando evolucao com %d geracoes\n", NUM_GERACOES);
-    //Loop das geraÁıes(g) [AG]
+    //Loop das gera√ß√µes(g) [AG]
     for(int g=0; g<NUM_GERACOES; g++){
 
-        //Crossover e MutaÁ„o
+        //Crossover e Muta√ß√£o
         int filhos_gerados = 0;
         while(filhos_gerados < TAM_POPULACAO){
             int pai1 = SelecaoTorneio(populacao, 3);
@@ -572,7 +572,7 @@ int main(){
             if(((float)rand()/RAND_MAX) < TAXA_CRUZAMENTO)
                 Crossover(populacao[pai1], populacao[pai2], nova_populacao[filhos_gerados],nova_populacao[filhos_gerados+1], numero_clientes);
             else{
-                //SÛ copia dos pais
+                //S√≥ copia dos pais
                 for(int k=0; k<numero_clientes; k++){
                     nova_populacao[filhos_gerados].alocacao[k] = populacao[pai1].alocacao[k];
                     nova_populacao[filhos_gerados+1].alocacao[k] = populacao[pai2].alocacao[k];
@@ -585,7 +585,7 @@ int main(){
             filhos_gerados += 2;
         }
 
-        //Avaliando a nova geraÁ„o
+        //Avaliando a nova gera√ß√£o
         int melhor_da_geracao = 0;
         for(int i=0; i<TAM_POPULACAO; i++){
             nova_populacao[i].custo = CalculaCustoTotalSolucao(nova_populacao[i].alocacao, clientes, analistas, numero_clientes, numero_analistas);
@@ -601,9 +601,9 @@ int main(){
         //Salvando o custo antes das buscas locais (printf)
         float custo_antes_busca = populacao[melhor_da_geracao].custo;
 
-         //Verificar se È v·lido com o professor
-        //Lapidando o melhor indivÌduo da geraÁ„o com as buscas locais
-        int* tempo_fake_analistas = (int*)calloc(numero_analistas , sizeof(int)); //inicializa com '0's um vetor de tempos fake (necess·rio para as buscas locais)
+         //Verificar se √© v√°lido com o professor
+        //Lapidando o melhor indiv√≠duo da gera√ß√£o com as buscas locais
+        int* tempo_fake_analistas = (int*)calloc(numero_analistas , sizeof(int)); //inicializa com '0's um vetor de tempos fake (necess√°rio para as buscas locais)
         for(int i=0; i<numero_clientes; i++){
             int analista = populacao[melhor_da_geracao].alocacao[i];
             if(analista >= 0)
@@ -728,7 +728,7 @@ float tempo_viagem_minutos = (dist_total / analistas[i].velocidade_media) * 60.0
                 custo_fitness += 2000000.0;
         }
 
-        //Imprime o cabeÁalho do Analista com a separaÁ„o dos Custos
+        //Imprime o cabe√ßalho do Analista com a separa√ß√£o dos Custos
         printf("\n[Analista %02d] Visitas: %02d | Distancia: %5.2f km | Jornada: %02dh %02dm\n", i, visitas, dist_total, horas, minutos);
         printf(" -> Custo Financeiro Real: R$ %7.2f | Custo Fitness (com multas): R$ %7.2f\n", custo_financeiro, custo_fitness);
 
